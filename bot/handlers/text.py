@@ -34,7 +34,7 @@ def load_trigger_phrases():
 
 trigger_phrases = load_trigger_phrases()
 
-# Шансы выпадения карточек по редкости
+# Шансы выпадения карточек по редкости (в процентах)
 RARITY_PROBABILITIES = {
     "common": 50,
     "rare": 25,
