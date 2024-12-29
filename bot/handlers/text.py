@@ -43,7 +43,7 @@ def can_receive_card(user_id):
     last_drop_time = datetime.strptime(last_drop, '%Y-%m-%d %H:%M:%S')
     return datetime.now() - last_drop_time >= timedelta(hours=12)
 
-@text_router.message()
+@text_router.message(F.text)
 async def text(message: types.Message):
     user_id = message.from_user.id
     username = message.from_user.username

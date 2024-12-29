@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from dotenv import load_dotenv
 from .handlers.basic import base_router
+from .handlers.text import text_router
 
 async def main():
     # Подгружаем виртуальное окружение
@@ -16,7 +17,7 @@ async def main():
     # Диспетчер
     dp = Dispatcher()
     # Регистрируем хэндлеры
-    dp.include_routers(base_router)
+    dp.include_routers(base_router, text_router)
     # Наконец, запуск
     await dp.start_polling(bot)
 
