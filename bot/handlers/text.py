@@ -4,7 +4,7 @@ import random
 from datetime import datetime, timedelta
 from aiogram import Router, types, F
 from bot import db
-from aiogram.types import InputFile
+from aiogram.types import FSInputFile
 
 text_router = Router()
 
@@ -115,7 +115,7 @@ async def text(message: types.Message):
         await message.reply(f"Изображение карточки {card['picture_name']} не найдено.")
         return
 
-    photo = InputFile(card_image_path)
+    photo = FSInputFile(card_image_path)
     await message.reply_photo(photo, caption=f"💪 У вас новая карточка: \n\n"
                                              f"Имя: {card['name']}\n"
                                              f"Редкость: {card['rarity'].capitalize()}")
