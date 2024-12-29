@@ -1,8 +1,9 @@
 [
-    {"id": 1,
-    "name": "Панчан в корзинке",
-    "rarity": "common",
-    "picture_name": "id1.jpg"
+    {   
+        "id": 1,
+        "name": "Панчан в корзинке",
+        "rarity": "common",
+        "picture_name": "id1.jpg"
     },
     {
         "id": 2,
