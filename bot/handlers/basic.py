@@ -74,11 +74,11 @@ def can_receive_card(user_id):
 @base_router.message(Command("start"))
 async def cmd_start(message: types.Message):
     first_name = message.from_user.first_name
-    await message.reply(f"Привет {first_name},\n\n"
-                        f"Для начала рекомендую ознакомиться с инстаграммом хозяйки: https://www.instagram.com/tansoku_love/\n"
-                        "Чтобы получить карту напишите \"качан\", \"панчан\", \"дай карту\" или /get_card\n\n"
-                        "Создатель бота @komaru_dude\n"
-                        "Гитхаб: https://github.com/Komaru-dude/Panchan-cards")
+    await message.reply(f"👋 Привет {first_name},\n\n"
+                        "💡 Для начала рекомендую ознакомиться с инстаграммом хозяйки: https://www.instagram.com/tansoku_love/\n"
+                        "💡 Чтобы получить карту напишите \"качан\", \"панчан\", \"дай карту\" или /get_card\n\n"
+                        "📝 Создатель бота @komaru_dude\n"
+                        "🧨 Гитхаб: https://github.com/Komaru-dude/Panchan-cards")
     
 @base_router.message(Command("get_card"))
 async def cmd_get_card(message: types.Message):
