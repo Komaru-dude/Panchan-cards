@@ -59,10 +59,12 @@ def can_receive_card(user_id):
     if not next_drop:
         return True
 
+    next_drop_time = next_drop[0] if isinstance(next_drop, tuple) else next_drop
+
     try:
-        last_drop_time = datetime.strptime(next_drop, '%Y-%m-%d %H:%M:%S')
+        last_drop_time = datetime.strptime(next_drop_time, '%Y-%m-%d %H:%M:%S')
     except ValueError:
-        raise RuntimeError(f"Неверный формат времени последнего дропа: {next_drop}")
+        raise RuntimeError(f"Неверный формат времени последнего дропа: {next_drop_time}")
 
     # Проверяем, прошло ли 12 часов
     if datetime.now() - last_drop_time >= timedelta(hours=12):
