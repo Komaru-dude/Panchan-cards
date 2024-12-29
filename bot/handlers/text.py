@@ -34,7 +34,7 @@ def load_trigger_phrases():
 
 trigger_phrases = load_trigger_phrases()
 
-# Шансы выпадения карточек по редкости
+# Шансы выпадения карточек по редкости (в процентах)
 RARITY_PROBABILITIES = {
     "common": 50,
     "rare": 25,
@@ -117,5 +117,5 @@ async def text(message: types.Message):
 
     photo = FSInputFile(card_image_path)
     await message.reply_photo(photo, caption=f"💪 У вас новая карточка: \n\n"
-                                             f"Имя: {card['name']}\n"
-                                             f"Редкость: {card['rarity'].capitalize()}")
+                                             f"👤 Имя: {card['name']}\n"
+                                             f"💎 Редкость: {card['rarity'].capitalize()}")

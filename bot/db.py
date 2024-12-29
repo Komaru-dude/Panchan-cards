@@ -14,6 +14,8 @@ def create_db():
                         username TEXT DEFAULT '',
                         rank TEXT DEFAULT 'Гость',
                         first_name TEXT DEFAULT '',
+                        coins INTEGER DEFAULT 0,
+                        gems INTEGER DEFAULT 0,
                         next_card_time TEXT DEFAULT '2000-01-01 00:00:00'
                     )''')
 
@@ -82,13 +84,6 @@ def remove_card(user_id, card_id):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''DELETE FROM user_cards WHERE user_id = ? AND card_id = ?''', (user_id, card_id))
-    conn.commit()
-    conn.close()
-
-def update_card_quantity(user_id, card_id, quantity):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute('''UPDATE user_cards SET quantity = ? WHERE user_id = ? AND card_id = ?''', (quantity, user_id, card_id))
     conn.commit()
     conn.close()
 
