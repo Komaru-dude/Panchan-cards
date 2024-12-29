@@ -8,9 +8,11 @@ from aiogram.types import InputFile
 
 text_router = Router()
 
-# Загрузка данных о карточках
+# Пути к файлам
 CARDS_JSON_PATH = os.path.join(os.path.dirname(__file__), '..', 'media', 'cards_info.json')
+TRIGGER_PHRASES_PATH = os.path.join(os.path.dirname(__file__), '..', 'media', 'trigger_phrases.txt')
 
+# Загрузка данных о карточках
 def load_cards():
     try:
         with open(CARDS_JSON_PATH, 'r', encoding='utf-8') as file:
@@ -21,6 +23,16 @@ def load_cards():
         raise RuntimeError(f"Ошибка чтения JSON в {CARDS_JSON_PATH}")
 
 cards_data = load_cards()
+
+# Загрузка триггерных фраз
+def load_trigger_phrases():
+    try:
+        with open(TRIGGER_PHRASES_PATH, 'r', encoding='utf-8') as file:
+            return {line.strip().lower() for line in file if line.strip()}
+    except FileNotFoundError:
+        raise RuntimeError(f"Не удалось найти файл {TRIGGER_PHRASES_PATH}")
+
+trigger_phrases = load_trigger_phrases()
 
 # Шансы выпадения карточек по редкости
 RARITY_PROBABILITIES = {
@@ -42,28 +54,41 @@ def get_random_card():
         raise RuntimeError(f"Нет доступных карточек для редкости {selected_rarity}")
     return random.choice(available_cards)
 
-# Проверка, прошло ли 12 часов с последнего дропа
 def can_receive_card(user_id):
-    last_drop = db.get_last_drop_time(user_id)
-    if not last_drop:
+    next_drop = db.get_next_drop_time(user_id)
+    if not next_drop:
         return True
 
     try:
-        last_drop_time = datetime.strptime(last_drop, '%Y-%m-%d %H:%M:%S')
+        last_drop_time = datetime.strptime(next_drop, '%Y-%m-%d %H:%M:%S')
     except ValueError:
-        raise RuntimeError(f"Неверный формат времени последнего дропа: {last_drop}")
+        raise RuntimeError(f"Неверный формат времени последнего дропа: {next_drop}")
 
-    return datetime.now() - last_drop_time >= timedelta(hours=12)
+    # Проверяем, прошло ли 12 часов
+    if datetime.now() - last_drop_time >= timedelta(hours=12):
+        return True
+    else:
+        return False
 
+# Обработчик сообщений с использованием триггерных фраз
 @text_router.message(F.text)
 async def text(message: types.Message):
+    text = message.text.lower().strip()
     user_id = message.from_user.id
-    username = message.from_user.username or "Без имени"
-    first_name = message.from_user.first_name or ""
+    username = message.from_user.username
+    first_name = message.from_user.first_name
 
     # Добавление пользователя в базу, если его там нет
     if not db.user_exists(user_id):
         db.add_user(user_id, username, first_name=first_name)
+    # Проверяем забанен ли пользователь
+    user_rank = db.get_data(user_id, field="rank")
+    if user_rank == "Забанен":
+        user_banned = True
+    else:
+        user_banned = False
+    if text not in trigger_phrases or user_banned:
+        return  # Игнорируем сообщение, если оно не в списке триггеров или пользователь заблокирован в боте
 
     # Проверка, может ли пользователь получить карточку
     if not can_receive_card(user_id):
@@ -79,6 +104,8 @@ async def text(message: types.Message):
 
     drop_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     db.add_card(user_id, card['id'], drop_time)
+    next_drop_time = datetime.now() + timedelta(hours=12)
+    db.set_data(user_id, "next_card_time", next_drop_time.strftime('%Y-%m-%d %H:%M:%S'))
 
     # Отправка информации пользователю
     card_image_path = os.path.join(os.path.dirname(__file__), '..', 'media', 'cards', card['picture_name'])
@@ -87,6 +114,6 @@ async def text(message: types.Message):
         return
 
     photo = InputFile(card_image_path)
-    await message.reply_photo(photo, caption=f"Поздравляем! Вы получили карточку: \n\n"
-                                             f"Название: {card['name']}\n"
+    await message.reply_photo(photo, caption=f"💪 У вас новая карточка: \n\n"
+                                             f"Имя: {card['name']}\n"
                                              f"Редкость: {card['rarity'].capitalize()}")

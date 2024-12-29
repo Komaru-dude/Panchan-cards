@@ -2,3 +2,5 @@
 # Переименуйте в .env если будете использовать
 
 BOT_API_TOKEN=your_api_token # Можно получить тут: https://t.me/BotFather
+
+ADMIN_ID=your_admin_id # Айди вашего Telegram аккаунта

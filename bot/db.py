@@ -13,7 +13,8 @@ def create_db():
                         user_id INTEGER PRIMARY KEY,
                         username TEXT DEFAULT '',
                         rank TEXT DEFAULT 'Гость',
-                        first_name TEXT DEFAULT ''
+                        first_name TEXT DEFAULT '',
+                        next_card_time TEXT DEFAULT '2000-01-01 00:00:00'
                     )''')
 
     # Таблица карточек
@@ -32,6 +33,35 @@ def create_db():
 # Проверяем существование базы данных
 if not os.path.exists(DB_PATH):
     create_db()
+
+# Функция для проверки ранга пользователя
+def has_permission(user_id, level):
+    # Словарь с уровнями и соответствующими рангами
+    rank_to_level = {
+        "Забанен": 0,
+        "Гость": 1,
+        "Активный": 2,
+        "Администратор": 3,
+    }
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    
+    # Извлекаем ранг пользователя
+    cursor.execute('''SELECT rank FROM users WHERE user_id = ?''', (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result is None:
+        return False
+    
+    user_rank = result[0]  # Получаем статус пользователя
+    user_level = rank_to_level.get(user_rank)
+    
+    if user_level is None:
+        return False  # Если ранг не найден в словаре, возвращаем False
+
+    return user_level >= level  # Проверяем, соответствует ли уровень пользователя требуемому
 
 def add_card(user_id, card_id, drop_time, quantity=1):
     conn = sqlite3.connect(DB_PATH)
@@ -95,11 +125,55 @@ def user_exists(user_id):
     conn.close()
     return exists
 
-def get_last_drop_time(user_id):
+def reset_cooldown(user_id):
+    """Сбрасывает время кулдауна для пользователя"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute('SELECT MAX(drop_time) FROM user_cards WHERE user_id = ?', (user_id,))
-    last_drop = cursor.fetchone()[0]
+    old_date = "2000-01-01 00:00:00"  # Устанавливаем значение сброса
+    cursor.execute('''UPDATE users SET next_card_time = ? WHERE user_id = ?''', (old_date, user_id))
+    conn.commit()
     conn.close()
-    return last_drop
 
+def get_data(user_id, mode="one", field=""):
+    """
+    Извлекает данные из таблицы users.
+    :param user_id: ID пользователя
+    :param mode: Режим работы ("one" для одного поля, "all" для всех данных пользователя)
+    :param field: Название поля (только для mode="one")
+    :return: Значение поля (mode="one") или все данные пользователя (mode="all")
+    """
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    if mode == "one":
+        if not field:
+            raise RuntimeError("Нужно указать поле перед извлечением данных")
+        cursor.execute(f'''SELECT {field} FROM users WHERE user_id = ?''', (user_id,))
+        result = cursor.fetchone()
+        conn.close()
+        return result[0] if result else None  # Возвращаем значение поля или None, если пользователь отсутствует
+
+    elif mode == "all":
+        cursor.execute('''SELECT * FROM users WHERE user_id = ?''', (user_id,))
+        result = cursor.fetchone()
+        conn.close()
+        return result  # Возвращаем все данные пользователя или None
+
+    else:
+        conn.close()
+        raise RuntimeError("Такого режима не существует")
+    
+def set_data(user_id, field, data):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute(f'''UPDATE users SET {field} = ? WHERE user_id = ?''', (data, user_id))
+    conn.commit()
+    conn.close()
+
+def get_next_drop_time(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT next_card_time FROM users WHERE user_id = ?''', (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result
