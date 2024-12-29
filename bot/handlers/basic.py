@@ -125,3 +125,29 @@ async def cmd_get_card(message: types.Message):
     await message.reply_photo(photo, caption=f"💪 У вас новая карточка: \n\n"
                                              f"👤 Имя: {card['name']}\n"
                                              f"💎 Редкость: {card['rarity'].capitalize()}")
+
+@base_router.message(Command("profile"))
+async def cmd_profile(message: types.Message):
+    user_id = message.from_user.id
+
+    # Проверяем, существует ли пользователь в базе
+    if not db.user_exists(user_id):
+        await message.reply("Вы ещё не зарегистрированы. Используйте команду /start.")
+        return
+
+    # Получаем данные пользователя
+    userdata = db.get_data(user_id, mode="all")
+    rank = userdata[2]
+    first_name = userdata[3]
+    unique_cards = userdata[4] or 0  # Если значение отсутствует, ставим 0
+    coins = userdata[5]
+    gems = userdata[6]
+    total_cards = len(cards_data)  # Общее количество карт из JSON
+
+    # Формируем ответ
+    await message.reply(f"📜 **Ваш профиль**\n\n"
+                        f"👤 Имя: {first_name or 'Не указано'}\n"
+                        f"⚙️ Ранг: {rank}\n"
+                        f"🃏 Уникальных карточек: {unique_cards}/{total_cards}\n"
+                        f"💰 Монет: {coins}\n"
+                        f"💎 Кристаллов: {gems}\n")

@@ -28,5 +28,29 @@
         "name": "Панчана чешут",
         "rarity": "epic",
         "picture_name": "id5.jpg"
+    },
+    {
+        "id": 6,
+        "name": "Панчан араб",
+        "rarity": "legendary",
+        "picture_name": "panchan_arab.jpg"
+    },
+    {
+        "id": 7,
+        "name": "Хэллоуинский Тобо-кун",
+        "rarity": "legendary",
+        "picture_name": "tobokun_halloween.jpg"
+    },
+    {
+        "id": 8,
+        "name": "Гома в шоке",
+        "rarity": "rare",
+        "picture_name": "id8.jpg"
+    },
+    {
+        "id": 9,
+        "name": "Гома злая",
+        "rarity": "rare",
+        "picture_name": "id9.jpg"
     }
 ]
