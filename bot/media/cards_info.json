@@ -1,0 +1,13 @@
+[
+    {"id": 1,
+    "name": "Панчан в корзинке",
+    "rarity": "common",
+    "picture_name": "id1.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Сонная гома",
+        "rarity": "epic",
+        "picture_name": "id2.jpg"
+    }
+]

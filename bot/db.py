@@ -12,7 +12,7 @@ def create_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS users (
                         user_id INTEGER PRIMARY KEY,
                         username TEXT DEFAULT '',
-                        rank TEXT DEFAULT 'Участник',
+                        rank TEXT DEFAULT 'Гость',
                         first_name TEXT DEFAULT ''
                     )''')
 
@@ -65,24 +65,41 @@ def update_card_quantity(user_id, card_id, quantity):
 def get_user_cards(user_id):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-
-    # Выполняем SQL-запрос для получения всех карточек пользователя
     cursor.execute('''
         SELECT card_id, drop_time, quantity
         FROM user_cards
         WHERE user_id = ?
     ''', (user_id,))
-
-    # Извлекаем все карточки пользователя
     cards = cursor.fetchall()
-
-    # Преобразуем результат в список словарей
     cards_list = [{"card_id": card[0], "drop_time": card[1], "quantity": card[2]} for card in cards]
-
-    # Преобразуем список в строку JSON
     cards_json = json.dumps(cards_list, ensure_ascii=False, indent=4)
+    conn.close()
+    return cards_json
 
-    # Закрываем соединение с базой данных
+def add_user(user_id, username='', rank='Гость', first_name=''):
+    """Добавление нового пользователя в базу данных"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    username = username.lower()
+    cursor.execute('''INSERT INTO users (user_id, username, rank, first_name)
+                      VALUES (?, ?, ?, ?)''', (user_id, username, rank, first_name))
+    conn.commit()
     conn.close()
 
-    return cards_json
+def user_exists(user_id):
+    """Проверка существования пользователя в базе данных"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT 1 FROM users WHERE user_id = ? LIMIT 1''', (user_id,))
+    exists = cursor.fetchone() is not None
+    conn.close()
+    return exists
+
+def get_last_drop_time(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT MAX(drop_time) FROM user_cards WHERE user_id = ?', (user_id,))
+    last_drop = cursor.fetchone()[0]
+    conn.close()
+    return last_drop
+
