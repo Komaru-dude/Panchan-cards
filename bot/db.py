@@ -14,6 +14,7 @@ def create_db():
                         username TEXT DEFAULT '',
                         rank TEXT DEFAULT 'Гость',
                         first_name TEXT DEFAULT '',
+                        unique_cards TEXT DEFAULT '',
                         coins INTEGER DEFAULT 0,
                         gems INTEGER DEFAULT 0,
                         next_card_time TEXT DEFAULT '2000-01-01 00:00:00'
@@ -172,3 +173,11 @@ def get_next_drop_time(user_id):
     result = cursor.fetchone()
     conn.close()
     return result
+    
+def update_unique_cards(user_id):
+    user_cards = get_user_cards(user_id)  # Получаем карточки пользователя в формате JSON
+    user_cards = json.loads(user_cards)
+    unique_card_ids = {card["card_id"] for card in user_cards}  # Находим уникальные ID карточек
+    unique_count = len(unique_card_ids)
+    set_data(user_id, "unique_cards", unique_count)
+    return unique_count
