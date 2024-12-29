@@ -2,7 +2,7 @@ import json
 import os
 import random
 from datetime import datetime, timedelta
-from aiogram import Router, types
+from aiogram import Router, types, F
 from bot import db
 
 text_router = Router()
