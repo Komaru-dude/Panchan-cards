@@ -1,8 +1,6 @@
-import os
-from aiogram import Router, Bot, types
+from aiogram import Router, types
 from aiogram.filters import Command
 from bot import db
-from dotenv import load_dotenv
 
 adm_router = Router()
 

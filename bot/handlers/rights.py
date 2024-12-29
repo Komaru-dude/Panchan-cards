@@ -86,7 +86,7 @@ async def handle_rank_choice(callback_query: types.CallbackQuery, state: FSMCont
 
     # Логика смены ранга
     await bot.send_message(ADMIN_ID, text=f"Смена ранга: Пользователь {user_id} получает ранг '{rank}'.")
-    db.set_rank(user_id, rank)
+    db.set_data(user_id, "rank", rank)
     
     # Отправляем подтверждение
     await callback_query.answer(f"Ранг '{rank}' успешно установлен для пользователя с ID {user_id}.")
