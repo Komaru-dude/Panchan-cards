@@ -6,8 +6,26 @@
     },
     {
         "id": 2,
-        "name": "Сонная гома",
+        "name": "Сонная Гома",
         "rarity": "epic",
         "picture_name": "id2.jpg"
+    },
+    {
+        "id": 3,
+        "name": "Лежачий Качан",
+        "rarity": "rare",
+        "picture_name": "id3.jpg"
+    },
+    {
+        "id": 4,
+        "name": "У Панчана день рождения",
+        "rarity": "mythic",
+        "picture_name": "id4.jpg"
+    },
+    {
+        "id": 5,
+        "name": "Панчана чешут",
+        "rarity": "epic",
+        "picture_name": "id5.jpg"
     }
 ]
