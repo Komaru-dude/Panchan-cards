@@ -74,7 +74,7 @@ def can_receive_card(user_id):
 @base_router.message(Command("start"))
 async def cmd_start(message: types.Message):
     first_name = message.from_user.first_name
-    await message.reply(f"Привет {first_name}\n\n"
+    await message.reply(f"Привет {first_name},\n\n"
                         f"Для начала рекомендую ознакомиться с инстаграммом хозяйки: https://www.instagram.com/tansoku_love/\n"
                         "Чтобы получить карту напишите \"качан\", \"панчан\", \"дай карту\" или /get_card\n\n"
                         "Создатель бота @komaru_dude\n"
