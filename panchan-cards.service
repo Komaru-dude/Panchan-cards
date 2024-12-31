@@ -5,14 +5,14 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/panchaniche/Panchan-cards
-EnvironmentFile=/home/panchaniche/Panchan-cards/.env
-ExecStartPre=/usr/bin/git -C /home/panchaniche/Panchan-cards pull
-ExecStart=/home/panchaniche/Panchan-cards/venv/bin/python -m bot
+WorkingDirectory=/home/panchan/Panchan-cards
+EnvironmentFile=/home/panchan/Panchan-cards/.env
+ExecStartPre=/usr/bin/git -C /home/panchan/Panchan-cards pull
+ExecStart=/home/panchan/Panchan-cards/venv/bin/python -m bot
 KillMode=process
 Restart=always
 RestartSec=10
-User=panchaniche
+User=panchan
 
 [Install]
 WantedBy=multi-user.target
