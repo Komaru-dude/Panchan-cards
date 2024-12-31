@@ -52,5 +52,11 @@
         "name": "Гома злая",
         "rarity": "rare",
         "picture_name": "id9.jpg"
+    },
+    {
+        "id": 10,
+        "name": "Утюгчан",
+        "rarity": "common",
+        "picture_name": "id10.jpg"
     }
 ]

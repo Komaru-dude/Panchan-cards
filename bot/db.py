@@ -104,14 +104,16 @@ def get_user_cards(user_id):
 
 def add_user(user_id, username='', rank='Гость', first_name=''):
     """Добавление нового пользователя в базу данных"""
+    if username is None:
+        username = ''  # Устанавливаем пустую строку, если username None
+    username = username.lower()
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    username = username.lower()
     cursor.execute('''INSERT INTO users (user_id, username, rank, first_name)
                       VALUES (?, ?, ?, ?)''', (user_id, username, rank, first_name))
     conn.commit()
     conn.close()
-
+    
 def user_exists(user_id):
     """Проверка существования пользователя в базе данных"""
     conn = sqlite3.connect(DB_PATH)
