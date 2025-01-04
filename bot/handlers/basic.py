@@ -66,10 +66,7 @@ def can_receive_card(user_id):
         raise RuntimeError(f"Неверный формат времени последнего дропа: {next_drop_time}")
 
     # Проверяем, прошло ли 12 часов
-    if datetime.now() - last_drop_time >= timedelta(hours=12):
-        return True
-    else:
-        return False
+    return datetime.now() - last_drop_time >= timedelta(hours=12)
 
 @base_router.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -79,7 +76,7 @@ async def cmd_start(message: types.Message):
                         "📝 Чтобы получить карту напишите \"качан\", \"панчан\", \"дай карту\" или /get_card\n\n"
                         "📱 Создатель бота @komaru_dude\n"
                         "🧨 Гитхаб: https://github.com/Komaru-dude/Panchan-cards")
-    
+
 @base_router.message(Command("get_card"))
 async def cmd_get_card(message: types.Message):
     user_id = message.from_user.id
@@ -89,13 +86,10 @@ async def cmd_get_card(message: types.Message):
     # Добавление пользователя в базу, если его там нет
     if not db.user_exists(user_id):
         db.add_user(user_id, username, first_name=first_name)
+
     # Проверяем забанен ли пользователь
     user_rank = db.get_data(user_id, field="rank")
     if user_rank == "Забанен":
-        user_banned = True
-    else:
-        user_banned = False
-    if user_banned:
         return  # Игнорируем сообщение, если пользователь заблокирован в боте
 
     # Проверка, может ли пользователь получить карточку
@@ -137,11 +131,11 @@ async def cmd_profile(message: types.Message):
 
     # Получаем данные пользователя
     userdata = db.get_data(user_id, mode="all")
-    rank = userdata[2]
-    first_name = userdata[3]
-    unique_cards = userdata[4] or 0  # Если значение отсутствует, ставим 0
-    coins = userdata[5]
-    gems = userdata[6]
+    if userdata is None:
+        await message.reply("Ошибка: данные пользователя не найдены.")
+        return
+
+    rank, first_name, unique_cards, coins, gems = userdata[2], userdata[3], userdata[4] or 0, userdata[5], userdata[6]
     total_cards = len(cards_data)  # Общее количество карт из JSON
 
     # Формируем ответ

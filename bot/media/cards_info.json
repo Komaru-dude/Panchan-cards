@@ -58,5 +58,23 @@
         "name": "Утюгчан",
         "rarity": "common",
         "picture_name": "id10.jpg"
+    },
+    {
+        "id": 11,
+        "name": "Недовольный панчан",
+        "rarity": "common",
+        "picture_name": "id11.jpg"
+    },
+    {
+        "id": 12,
+        "name": "Суу лежит",
+        "rarity": "common",
+        "picture_name": "id12.jpg"
+    },
+    {
+        "id": 13,
+        "name": "Выгодное предложение",
+        "rarity": "common",
+        "picture_name": "id13.jpg"
     }
 ]
