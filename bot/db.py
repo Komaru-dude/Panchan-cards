@@ -69,10 +69,26 @@ def has_permission(user_id, level):
 def add_card(user_id, card_id, drop_time, quantity=1):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute('''INSERT INTO user_cards (user_id, card_id, drop_time, quantity)
-                      VALUES (?, ?, ?, ?)''', (user_id, card_id, drop_time, quantity))
+
+    # Проверяем, есть ли такая карточка у пользователя
+    cursor.execute('''SELECT id, quantity FROM user_cards WHERE user_id = ? AND card_id = ?''', (user_id, card_id))
+    card = cursor.fetchone()
+
+    if card:
+        # Обновляем количество существующей карточки
+        new_quantity = card[1] + quantity
+        cursor.execute('''UPDATE user_cards SET quantity = ?, drop_time = ? WHERE id = ?''',
+                       (new_quantity, drop_time, card[0]))
+    else:
+        # Добавляем новую карточку
+        cursor.execute('''INSERT INTO user_cards (user_id, card_id, drop_time, quantity)
+                          VALUES (?, ?, ?, ?)''', (user_id, card_id, drop_time, quantity))
+
     conn.commit()
     conn.close()
+
+    # Обновляем уникальные карточки
+    update_unique_cards(user_id)
 
 def remove_all_cards(user_id):
     conn = sqlite3.connect(DB_PATH)
