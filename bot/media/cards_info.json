@@ -70,5 +70,11 @@
         "name": "Суу лежит",
         "rarity": "common",
         "picture_name": "id12.jpg"
+    },
+    {
+        "id": 13,
+        "name": "Выгодное предложение",
+        "rarity": "common",
+        "picture_name": "id13.jpg"
     }
 ]
