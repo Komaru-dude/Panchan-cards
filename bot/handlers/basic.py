@@ -2,6 +2,7 @@ import os, json, random
 from aiogram import Router, types
 from aiogram.types import FSInputFile
 from aiogram.filters import Command
+from aiogram.enums import ParseMode
 from datetime import datetime, timedelta
 from bot import db
 
@@ -144,4 +145,4 @@ async def cmd_profile(message: types.Message):
                         f"⚙️ Ранг: {rank}\n"
                         f"🃏 Уникальных карточек: {unique_cards}/{total_cards}\n"
                         f"💰 Монет: {coins}\n"
-                        f"💎 Кристаллов: {gems}\n")
+                        f"💎 Кристаллов: {gems}\n", parse_mode=ParseMode.MARKDOWN_V2)
