@@ -8,11 +8,9 @@ from bot import db
 
 base_router = Router()
 
-# Пути к файлам
 CARDS_JSON_PATH = os.path.join(os.path.dirname(__file__), '..', 'media', 'cards_info.json')
 TRIGGER_PHRASES_PATH = os.path.join(os.path.dirname(__file__), '..', 'media', 'trigger_phrases.txt')
 
-# Загрузка данных о карточках
 def load_cards():
     try:
         with open(CARDS_JSON_PATH, 'r', encoding='utf-8') as file:
@@ -24,7 +22,6 @@ def load_cards():
 
 cards_data = load_cards()
 
-# Загрузка триггерных фраз
 def load_trigger_phrases():
     try:
         with open(TRIGGER_PHRASES_PATH, 'r', encoding='utf-8') as file:
@@ -34,7 +31,6 @@ def load_trigger_phrases():
 
 trigger_phrases = load_trigger_phrases()
 
-# Шансы выпадения карточек по редкости (в процентах)
 RARITY_PROBABILITIES = {
     "common": 50,
     "rare": 25,
@@ -43,7 +39,6 @@ RARITY_PROBABILITIES = {
     "legendary": 2
 }
 
-# Определение карточки по вероятностям
 def get_random_card():
     rarities = list(RARITY_PROBABILITIES.keys())
     weights = list(RARITY_PROBABILITIES.values())
@@ -66,7 +61,6 @@ def can_receive_card(user_id):
     except ValueError:
         raise RuntimeError(f"Неверный формат времени последнего дропа: {next_drop_time}")
 
-    # Проверяем, прошло ли 12 часов
     return datetime.now() - last_drop_time >= timedelta(hours=12)
 
 @base_router.message(Command("start"))
@@ -84,21 +78,17 @@ async def cmd_get_card(message: types.Message):
     username = message.from_user.username
     first_name = message.from_user.first_name
 
-    # Добавление пользователя в базу, если его там нет
     if not db.user_exists(user_id):
         db.add_user(user_id, username, first_name=first_name)
 
-    # Проверяем забанен ли пользователь
     user_rank = db.get_data(user_id, field="rank")
     if user_rank == "Забанен":
-        return  # Игнорируем сообщение, если пользователь заблокирован в боте
+        return
 
-    # Проверка, может ли пользователь получить карточку
     if not can_receive_card(user_id):
         await message.reply("Вы уже получали карточку за последние 12 часов. Попробуйте позже!")
         return
 
-    # Выдача карточки
     try:
         card = get_random_card()
     except RuntimeError as e:
@@ -110,7 +100,6 @@ async def cmd_get_card(message: types.Message):
     next_drop_time = datetime.now() + timedelta(hours=12)
     db.set_data(user_id, "next_card_time", next_drop_time.strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Отправка информации пользователю
     card_image_path = os.path.join(os.path.dirname(__file__), '..', 'media', 'cards', card['picture_name'])
     if not os.path.exists(card_image_path):
         await message.reply(f"Изображение карточки {card['picture_name']} не найдено.")
@@ -125,21 +114,18 @@ async def cmd_get_card(message: types.Message):
 async def cmd_profile(message: types.Message):
     user_id = message.from_user.id
 
-    # Проверяем, существует ли пользователь в базе
     if not db.user_exists(user_id):
         await message.reply("Вы ещё не зарегистрированы. Используйте команду /start.")
         return
 
-    # Получаем данные пользователя
     userdata = db.get_data(user_id, mode="all")
     if userdata is None:
         await message.reply("Ошибка: данные пользователя не найдены.")
         return
 
     rank, first_name, unique_cards, coins, gems = userdata[2], userdata[3], userdata[4] or 0, userdata[5], userdata[6]
-    total_cards = len(cards_data)  # Общее количество карт из JSON
+    total_cards = len(cards_data)
 
-    # Формируем ответ
     await message.reply(f"📜 **Ваш профиль**\n\n"
                         f"👤 Имя: {first_name or 'Не указано'}\n"
                         f"⚙️ Ранг: {rank}\n"
